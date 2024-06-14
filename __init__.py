@@ -10,6 +10,9 @@ from .any_switch import Any_Switch_invAIder, Any_Switch_Medium_invAIder, Any_Swi
 from .preview_image_if_true import PreviewImageifTrue_invAIder
 from .image_overlay import ImageOverlay_invAIder
 from .load_image_batch import LoadImageBatch_invAIder
+from .img2gif import img2gif_invAIder
+from .image_grid import ImageGrid_invAIder
+from .image_crop import ImageCrop_invAIder
 
 # A dictionary that contains all nodes you want to export with their names
 NODE_CLASS_MAPPINGS = {
@@ -30,6 +33,9 @@ NODE_CLASS_MAPPINGS = {
     "👾 Preview Image if True": PreviewImageifTrue_invAIder,
     "👾 Image Overlay": ImageOverlay_invAIder,
     "👾 Load Image Batch": LoadImageBatch_invAIder,
+    "👾 Img to Gif": img2gif_invAIder,
+    "👾 Image Grid": ImageGrid_invAIder,
+    "👾 Image Crop": ImageCrop_invAIder
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS']
