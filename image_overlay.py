@@ -48,12 +48,12 @@ class ImageOverlay_invAIder:
 
         # Extract base image mask
         if base_pil_image.mode == "RGBA":
-            base_mask = base_pil_image.split()[-1]  # Extract the alpha channel as the mask
+            base_mask = ImageOps.invert(base_pil_image.split()[-1])  # Extract the alpha channel as the mask
         else:
             if base_mask is not None:
                 base_mask = tensor2pil(base_mask)
             else:
-                base_mask = Image.new("L", base_pil_image.size, 255)  # Create a white mask (no alpha)
+                base_mask = Image.new("L", base_pil_image.size, 0)  # Create a black mask (no alpha)
 
         # Process overlay image if provided
         if overlay_image is not None:
@@ -62,12 +62,12 @@ class ImageOverlay_invAIder:
 
             # Extract overlay image mask
             if overlay_pil_image.mode == "RGBA":
-                overlay_mask = overlay_pil_image.split()[-1]  # Extract the alpha channel as the mask
+                overlay_mask = ImageOps.invert(overlay_pil_image.split()[-1])  # Extract the alpha channel as the mask
             else:
                 if overlay_mask is not None:
                     overlay_mask = tensor2pil(overlay_mask)
                 else:
-                    overlay_mask = Image.new("L", overlay_pil_image.size, 255)  # Create a white mask (no alpha)
+                    overlay_mask = Image.new("L", overlay_pil_image.size, 0)  # Create a black mask (no alpha)
 
             # Resize overlay image if needed
             if overlay_resize is not None:
@@ -92,10 +92,10 @@ class ImageOverlay_invAIder:
             overlay_pil_image = overlay_pil_image.rotate(rotation, expand=True)
             overlay_mask = overlay_mask.rotate(rotation, expand=True)
 
-            # Apply opacity to the overlay image
-            r, g, b, a = overlay_pil_image.split()
-            a = a.point(lambda x: max(0, int(x * (opacity / 100))))
-            overlay_pil_image = Image.merge("RGBA", (r, g, b, a))
+            # Apply opacity to the overlay image ##### NEEDS FIX!, CURRENTLY ASSUMES OVERALY HAS ALPHA CHANNEL, ERRORS IF IT DOESNT
+            #r, g, b, a = overlay_pil_image.split()
+            #a = a.point(lambda x: max(0, int(x * (opacity / 100))))
+            #overlay_pil_image = Image.merge("RGBA", (r, g, b, a))
 
             # Apply the overlay image to the base image
             base_pil_image.paste(overlay_pil_image, location, mask=ImageOps.invert(overlay_mask))

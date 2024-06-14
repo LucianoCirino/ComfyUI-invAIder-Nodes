@@ -64,12 +64,12 @@ class ImageCrop_invAIder:
 
         # Step 1: Extract the mask from the image or use the input mask
         if pil_image.mode == "RGBA":
-            mask = pil_image.split()[-1]  # Extract the alpha channel as the mask
+            mask = ImageOps.invert(pil_image.split()[-1])  # Extract the alpha channel as the mask
         else:
             if mask is not None:
                 mask = tensor2pil(mask)
             else:
-                mask = Image.new("L", pil_image.size, 255)  # Create a white mask (no alpha)
+                mask = Image.new("L", pil_image.size, 0)  # Create a black mask (no alpha)
 
         # Step 2: Crop both the image and the mask according to inputs
         cropped_image = pil_image.crop((x, y, x2, y2))
