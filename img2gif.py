@@ -52,7 +52,8 @@ class img2gif_invAIder:
         for filename in filenames:
             if filename.endswith(".jpg") or filename.endswith(".png"):
                 filepath = os.path.join(bilder_ordner, filename)
-                images.append(Image.open(filepath).convert("RGBA"))
+                with Image.open(filepath).convert("RGBA") as img:
+                    images.append(img.copy())
                 empty_Image_dir = False
 
         if empty_Image_dir: 

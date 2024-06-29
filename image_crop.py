@@ -1,7 +1,7 @@
 import torch
 from nodes import MAX_RESOLUTION
 from .utils import *
-from PIL import ImageOps
+from PIL import ImageOps, ImageChops
 
 class ImageCrop_invAIder:
     @classmethod
@@ -20,8 +20,8 @@ class ImageCrop_invAIder:
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "MASK", "IMAGE")
-    RETURN_NAMES = ("RGB_IMAGE", "MASK", "RGBA_IMAGE")
+    RETURN_TYPES = ("IMAGE", "MASK", "IMAGE", "INT", "INT")
+    RETURN_NAMES = ("RGB_IMAGE", "MASK", "RGBA_IMAGE", "X_OFFSET", "Y_OFFSET")
     FUNCTION = "node"
     CATEGORY = "👾 invAIder"
 
@@ -62,6 +62,7 @@ class ImageCrop_invAIder:
         if y < 0:
             y = 0
 
+        '''
         # Step 1: Extract the mask from the image or use the input mask
         if pil_image.mode == "RGBA":
             mask = ImageOps.invert(pil_image.split()[-1])  # Extract the alpha channel as the mask
@@ -70,7 +71,22 @@ class ImageCrop_invAIder:
                 mask = tensor2pil(mask)
             else:
                 mask = Image.new("L", pil_image.size, 0)  # Create a black mask (no alpha)
+        '''
 
+        # Step 1: Extract the mask from the image or use the input mask
+        if pil_image.mode == "RGBA":
+            alpha_mask = ImageOps.invert(pil_image.split()[-1])  # Extract the alpha channel as the mask
+            if mask is not None:
+                input_mask = tensor2pil(mask)  # Convert input mask tensor to PIL image
+                mask = ImageOps.invert(ImageChops.add(ImageOps.invert(input_mask), ImageOps.invert(alpha_mask)))  # Add the extracted alpha mask to the input mask
+            else:
+                mask = alpha_mask
+        else:
+            if mask is not None:
+                mask = tensor2pil(mask)
+            else:
+                mask = Image.new("L", pil_image.size, 0)  # Create a black mask (no alpha)
+    
         # Step 2: Crop both the image and the mask according to inputs
         cropped_image = pil_image.crop((x, y, x2, y2))
         cropped_mask = mask.crop((x, y, x2, y2))
@@ -85,4 +101,4 @@ class ImageCrop_invAIder:
         output_mask = pil2tensor(cropped_mask)
         output_rgba = pil2tensor(rgba_image)
 
-        return (output_rgb, output_mask, output_rgba)
+        return (output_rgb, output_mask, output_rgba, x_offset, y_offset)
