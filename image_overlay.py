@@ -15,8 +15,8 @@ class ImageOverlay_invAIder:
                 "base_image": ("IMAGE",),
                 "width": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 1}),
                 "height": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 1}),
-                "x_offset": ("INT", {"default": 0, "min": -48000, "max": 48000, "step": 10}),
-                "y_offset": ("INT", {"default": 0, "min": -48000, "max": 48000, "step": 10}),
+                "x_offset": ("INT", {"default": 0, "min": -48000, "max": 48000, "step": 1}),
+                "y_offset": ("INT", {"default": 0, "min": -48000, "max": 48000, "step": 1}),
                 "rotation": ("INT", {"default": 0, "min": -180, "max": 180, "step": 5}),
                 "opacity": ("FLOAT", {"default": 100, "min": 0, "max": 100, "step": 5}),
             },
@@ -55,7 +55,7 @@ class ImageOverlay_invAIder:
             base_pil_image = base_pil_image.convert("RGB")  # Convert base image to RGB
             if base_mask is not None:
                 base_mask = tensor2pil(base_mask)
-                base_mask = Image.composite(extracted_base_mask, Image.new("L", base_pil_image.size, color=Image.MAX_IMAGE_PIXELS), base_mask)
+                base_mask = Image.composite(extracted_base_mask, Image.new("L", base_pil_image.size, color=255), base_mask)
             else:
                 base_mask = extracted_base_mask
         else:
@@ -78,7 +78,7 @@ class ImageOverlay_invAIder:
                 overlay_pil_image = overlay_pil_image.convert("RGB")  # Convert overlay image to RGB
                 if overlay_mask is not None:
                     overlay_mask = tensor2pil(overlay_mask)
-                    overlay_mask = Image.composite(extracted_overlay_mask, Image.new("L", overlay_pil_image.size, color=Image.MAX_IMAGE_PIXELS), overlay_mask)
+                    overlay_mask = Image.composite(extracted_overlay_mask, Image.new("L", overlay_pil_image.size, color=255), overlay_mask)
                 else:
                     overlay_mask = extracted_overlay_mask
             else:

@@ -1,7 +1,7 @@
 from .any_save_and_load import Any_Save_invAIder, Any_Load_invAIder
 from .signed_integer import Signed_Integer_invAIder
 from .number_counter import Number_Counter_invAIder
-from .save_image_if_true import SaveImageIfTrue_invAIder, SaveImageIfTrue2_invAIder, SaveAnimatedPNGIfTrue_invAIder
+from .save_image_if_true import SaveImageIfTrue_invAIder, SaveAnimatedPNGIfTrue_invAIder
 from .seed_controller import SeedControl_invAIder
 from .evaluate_anything import Evaluate_Anything_invAIder
 from .any_to_any import Any_to_Any_invAIder
@@ -13,6 +13,7 @@ from .load_image_batch import LoadImageBatch_invAIder
 from .img2gif import img2gif_invAIder
 from .image_grid import ImageGrid_invAIder
 from .image_crop import ImageCrop_invAIder
+from .is_image_full_transparent import IsImageFullyTransparent_invAIder
 
 # A dictionary that contains all nodes you want to export with their names
 NODE_CLASS_MAPPINGS = {
@@ -21,7 +22,6 @@ NODE_CLASS_MAPPINGS = {
     "👾 Signed Integer": Signed_Integer_invAIder,
     "👾 Number Counter": Number_Counter_invAIder,
     "👾 Save Image If True": SaveImageIfTrue_invAIder,
-    "👾 Save Image If True 2": SaveImageIfTrue2_invAIder,
     "👾 Save AnimPNG If True": SaveAnimatedPNGIfTrue_invAIder,
     "👾 Seed Controller": SeedControl_invAIder,
     "👾 Evaluate Anything": Evaluate_Anything_invAIder,
@@ -35,7 +35,8 @@ NODE_CLASS_MAPPINGS = {
     "👾 Load Image Batch": LoadImageBatch_invAIder,
     "👾 Img to Gif": img2gif_invAIder,
     "👾 Image Grid": ImageGrid_invAIder,
-    "👾 Image Crop": ImageCrop_invAIder
+    "👾 Image Crop": ImageCrop_invAIder,
+    "👾 Is Image Fully Transparent": IsImageFullyTransparent_invAIder
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS']
