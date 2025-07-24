@@ -3,7 +3,6 @@ import numpy as np
 from PIL import Image, ImageOps
 
 from .utils import *
-
 import comfy.utils
 from nodes import MAX_RESOLUTION
 
@@ -26,7 +25,7 @@ class ImageOverlay_invAIder:
                 "overlay_mask": ("MASK",),
                 "overlay_resize": (["None", "Fit", "Resize by rescale_factor", "Resize to width & heigth"],),
                 "resize_method": (["nearest-exact", "bilinear", "area"],),
-                "rescale_factor": ("FLOAT", {"default": 1, "min": 0.01, "max": 16.0, "step": 0.1}),
+                "rescale_factor": ("FLOAT", {"default": 1, "min": 0.01, "max": 16.0, "step": 0.01}),
             }
         }
 
@@ -49,18 +48,23 @@ class ImageOverlay_invAIder:
         # Convert base image to PIL Image
         base_pil_image = tensor2pil(base_image)
 
+        # Scale base_mask to match base image size if needed
+        if base_mask is not None:
+            base_mask = tensor2pil(base_mask)
+            if base_mask.size != base_pil_image.size:
+                base_mask = base_mask.resize(base_pil_image.size, Image.Resampling.LANCZOS)
+
         # Extract and process base image mask
         if base_pil_image.mode == "RGBA":
-            extracted_base_mask = ImageOps.invert(base_pil_image.split()[-1])  # Extract the alpha channel as the mask
-            base_pil_image = base_pil_image.convert("RGB")  # Convert base image to RGB
+            extracted_base_mask = ImageOps.invert(base_pil_image.split()[-1])
+            base_pil_image = base_pil_image.convert("RGB")
             if base_mask is not None:
-                base_mask = tensor2pil(base_mask)
                 base_mask = Image.composite(extracted_base_mask, Image.new("L", base_pil_image.size, color=255), base_mask)
             else:
                 base_mask = extracted_base_mask
         else:
             if base_mask is not None:
-                base_mask = tensor2pil(base_mask)
+                base_mask = base_mask.resize(base_pil_image.size, Image.Resampling.LANCZOS)
             else:
                 base_mask = Image.new("L", base_pil_image.size, 0)
 
@@ -72,18 +76,25 @@ class ImageOverlay_invAIder:
             # Convert overlay image to PIL Image
             overlay_pil_image = tensor2pil(overlay_image)
 
+            # Scale overlay_mask to match overlay image size if needed
+            if overlay_mask is not None:
+                overlay_mask = tensor2pil(overlay_mask)
+                if overlay_mask.size != overlay_pil_image.size:
+                    overlay_mask = overlay_mask.resize(overlay_pil_image.size, Image.Resampling.LANCZOS)
+
             # Extract and process overlay image mask
             if overlay_pil_image.mode == "RGBA":
-                extracted_overlay_mask = ImageOps.invert(overlay_pil_image.split()[-1])  # Extract the alpha channel as the mask
-                overlay_pil_image = overlay_pil_image.convert("RGB")  # Convert overlay image to RGB
+                extracted_overlay_mask = ImageOps.invert(overlay_pil_image.split()[-1])
+                overlay_pil_image = overlay_pil_image.convert("RGB")
                 if overlay_mask is not None:
-                    overlay_mask = tensor2pil(overlay_mask)
-                    overlay_mask = Image.composite(extracted_overlay_mask, Image.new("L", overlay_pil_image.size, color=255), overlay_mask)
+                    overlay_mask = Image.composite(extracted_overlay_mask, 
+                                                Image.new("L", overlay_pil_image.size, color=255), 
+                                                overlay_mask)
                 else:
                     overlay_mask = extracted_overlay_mask
             else:
                 if overlay_mask is not None:
-                    overlay_mask = tensor2pil(overlay_mask)
+                    overlay_mask = overlay_mask.resize(overlay_pil_image.size, Image.Resampling.LANCZOS)
                 else:
                     overlay_mask = Image.new("L", overlay_pil_image.size, 0)
 
@@ -104,14 +115,17 @@ class ImageOverlay_invAIder:
                 overlay_image = comfy.utils.common_upscale(samples, overlay_image_size[0], overlay_image_size[1], resize_method, False)
                 overlay_image = overlay_image.movedim(1, -1)
                 overlay_pil_image = tensor2pil(overlay_image)
-                overlay_mask = overlay_mask.resize(overlay_pil_image.size)
+                
+                # Resize overlay mask to match the new overlay image size
+                overlay_mask = overlay_mask.resize(overlay_image_size, Image.Resampling.LANCZOS)
 
             # Rotate the overlay image and mask
             overlay_pil_image = overlay_pil_image.rotate(rotation, expand=True)
             overlay_mask = overlay_mask.rotate(rotation, expand=True)
 
             # Apply opacity to the overlay mask
-            #overlay_mask = Image.eval(overlay_mask, lambda x: int(x * (opacity / 100)))
+            if opacity < 100:
+                overlay_mask = Image.eval(overlay_mask, lambda x: int(x * (opacity / 100)))
 
             # Create an RGBA version of the overlay image
             overlay_rgba = Image.new("RGBA", overlay_pil_image.size)
@@ -122,8 +136,7 @@ class ImageOverlay_invAIder:
 
             # Paste the overlay onto the base image
             base_pil_image = base_pil_image.convert("RGBA")
-            base_pil_image.alpha_composite(overlay_rgba.rotate(rotation, expand=True), location)
-
+            base_pil_image.alpha_composite(overlay_rgba, location)
 
         # The base_pil_image is now our final composed image
         rgba_image = base_pil_image
@@ -134,5 +147,4 @@ class ImageOverlay_invAIder:
         output_rgba = pil2tensor(rgba_image)
         output_mask = pil2tensor(base_mask)
 
-        # Return the edited base image (RGB and RGBA) and the mask
         return (output_rgb, output_rgba, output_mask)

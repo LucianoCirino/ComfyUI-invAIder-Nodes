@@ -34,11 +34,20 @@ class SaveImage:
     CATEGORY = "image"
 
     def save_images(self, images, filename_prefix="ComfyUI", prefix_as_filename=False, save_path="", prompt=None, extra_pnginfo=None):
+        output_dir = self.output_dir
+        
+        # Handle save_path
         if save_path:
-            self.output_dir = save_path
+            # Check if save_path contains a drive specification (like C:)
+            if os.path.splitdrive(save_path)[0]:
+                # Absolute path with drive specified
+                output_dir = save_path
+            else:
+                # Relative path - join with the base output directory
+                output_dir = os.path.join(self.output_dir, save_path)
         
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
         for (batch_number, image) in enumerate(images):
             i = 255. * image.cpu().numpy()
@@ -98,7 +107,11 @@ class SaveImageIfTrue_invAIder:
     def node(self, image, save, filename_prefix, prefix_as_filename, save_path="", prompt=None, extra_pnginfo=None):
         if save:
             save_image_instance = SaveImage()
-            save_image_instance.output_dir = save_path if save_path else save_image_instance.output_dir
+            # Handle save_path here
+            if save_path:
+                # Don't modify save_image_instance.output_dir directly
+                # The path handling is done in save_images method
+                pass
             save_image_instance.type = "output"
             save_image_instance.prefix_append = ""
             save_image_instance.compress_level = 4

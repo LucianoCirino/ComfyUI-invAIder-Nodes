@@ -30,7 +30,8 @@ class LoadImageBatch_invAIder:
         return {
             "required": { 
                 "step_size": ("INT", {"default": 1, "min": 1, "max": 150000, "step": 1}), 
-                "path": ("STRING", {"default": '', "multiline": False}),  
+                "path": ("STRING", {"default": '', "multiline": False}),
+                "start_index": ("INT", {"default": 1, "min": 1, "max": 150000, "step": 1}),
             },
             "optional": { 
                 "restart": (anyType,),
@@ -46,7 +47,7 @@ class LoadImageBatch_invAIder:
     FUNCTION = "node"
     CATEGORY = "👾 invAIder"
 
-    def node(self, step_size, path, restart=0):
+    def node(self, step_size, path, start_index, restart=0):
         # Convert the anyType inputs to their correct modes
         restart = bool(restart)
 
@@ -56,7 +57,7 @@ class LoadImageBatch_invAIder:
 
         if restart or not self.Started:
             self.counter = 0
-            self.activ_index = 0
+            self.activ_index = start_index - 1  # Adjust for 0-based index
             self.Started = True
 
         fileArray = []

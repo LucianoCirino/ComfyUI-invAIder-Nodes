@@ -103,7 +103,7 @@ class Any_Switch_Large_invAIder:
             any_value = any_04
         elif any_05 is not None:
             any_value = any_05
-        if any_06 is not None:
+        elif any_06 is not None:
             any_value = any_06
         elif any_07 is not None:
             any_value = any_07

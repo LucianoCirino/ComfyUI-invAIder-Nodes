@@ -22,14 +22,30 @@ try:
         CATEGORY = "👾 invAIder"
 
         def node(self, python_expression, a=0, b=0, c=0):
-            result = simpleeval.simple_eval(python_expression, names={'a': a, 'b': b, 'c': c})
+            # Clean input values if they're strings
+            cleaned_values = {}
+            for key, value in {'a': a, 'b': b, 'c': c}.items():
+                # Handle string values
+                if isinstance(value, str):
+                    # Remove 'undefined' if it appears in the string
+                    cleaned_value = value.replace('undefined', '')
+                    cleaned_values[key] = cleaned_value
+                else:
+                    cleaned_values[key] = value
+                    
+            # Evaluate the expression with cleaned values
+            result = simpleeval.simple_eval(python_expression, names=cleaned_values)
+
+            # If result is a string, clean it too
+            if isinstance(result, str):
+                result = result.replace('undefined', '')
 
             try:
                 int_result = int(result)
             except (ValueError, TypeError):
                 int_result = 0
 
-            info = f"a = {a}\nb = {b}\nc = {c}\n"
+            info = f"a = {cleaned_values['a']}\nb = {cleaned_values['b']}\nc = {cleaned_values['c']}\n"
             info += f"expression: {python_expression}\n\n"
             info += f"INT: " + str(int_result)
 
