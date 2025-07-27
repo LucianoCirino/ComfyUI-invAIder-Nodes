@@ -1,1 +1,1 @@
-Custom nodes I've created for my oiwn personal workflows. Use at your own discretion.
+Custom nodes I've created for my own personal workflows. Use at your own discretion.
