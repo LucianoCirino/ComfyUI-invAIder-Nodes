@@ -1,1 +1,1 @@
-A collection of my own custom nodes I use for personal workflows.
+Custom nodes I've created for my oiwn personal workflows. Use at your own discretion.
