@@ -14,8 +14,6 @@ from .img2gif import img2gif_invAIder
 from .image_grid import ImageGrid_invAIder
 from .image_crop import ImageCrop_invAIder
 from .is_image_full_transparent import IsImageFullyTransparent_invAIder
-from .reverse_latents_batch import ReverseLatentBatch_invAIder
-from .wan_latent_concat import WanLatentConcat_invAIder
 from .debug_tensor_structure import DebugTensorStructure_invAIder
 
 # A dictionary that contains all nodes you want to export with their names
@@ -40,8 +38,6 @@ NODE_CLASS_MAPPINGS = {
     "👾 Image Grid": ImageGrid_invAIder,
     "👾 Image Crop": ImageCrop_invAIder,
     "👾 Is Image Fully Transparent": IsImageFullyTransparent_invAIder,
-    "👾 Reverse Latent Batch": ReverseLatentBatch_invAIder,
-    "👾 Wan Latent Concat": WanLatentConcat_invAIder,
     "👾 Debug Tensor Structure ": DebugTensorStructure_invAIder
 }
 
